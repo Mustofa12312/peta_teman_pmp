@@ -37,7 +37,7 @@ export default function AddFriendSheet({ open, onClose, onSaved }) {
     e.preventDefault();
 
     if (!nama || !foto || !pos) {
-      alert("Nama, foto, dan lokasi wajib");
+      alert("Nama, foto, dan lokasi wajib!");
       return;
     }
 
@@ -80,94 +80,40 @@ export default function AddFriendSheet({ open, onClose, onSaved }) {
   if (!open) return null;
 
   return (
-    <div style={overlay} onClick={onClose}>
-      <div style={sheet} onClick={(e) => e.stopPropagation()}>
-        <div style={handle} />
-        <h3 style={{ marginBottom: 8 }}>MUSI MAPS</h3>
+    <div className="ui-overlay" onClick={onClose}>
+      <div className="ui-sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="ui-drag-handle" />
+        <h3 className="ui-title">MUSI MAPS</h3>
 
         <form onSubmit={submit}>
           <input
-            placeholder="Nama"
+            placeholder="Nama Teman"
             value={nama}
             onChange={(e) => setNama(e.target.value)}
-            style={input}
+            className="ui-input"
           />
 
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setFoto(e.target.files[0])}
-            style={input}
+            className="ui-input"
           />
 
-          <button type="button" onClick={ambilGPS} style={btnGhost}>
-            📍 Ambil GPS
+          <button type="button" onClick={ambilGPS} className="ui-button ui-button-ghost">
+            <svg className="icon" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+            </svg>
+            Ambil Lokasi GPS Saat Ini
           </button>
 
-          {pos && <p style={{ fontSize: 12 }}>Lokasi siap ✓</p>}
+          {pos && <p className="ui-text-muted" style={{ textAlign: "center", marginTop: "12px", marginBottom: "4px" }}>✅ Lokasi tersimpan!</p>}
 
-          <button disabled={loading} style={btnPrimary}>
-            {loading ? "Menyimpan..." : "Simpan"}
+          <button disabled={loading} className="ui-button ui-button-primary" style={{ marginTop: "16px" }}>
+            {loading ? "Menyimpan Pindai..." : "Simpan Data"}
           </button>
         </form>
       </div>
     </div>
   );
 }
-
-/* =====================
-   🎨 STYLE
-   ===================== */
-const overlay = {
-  position: "fixed",
-  inset: 0,
-  background: "rgba(0,0,0,.45)",
-  zIndex: 1000,
-};
-
-const sheet = {
-  position: "absolute",
-  bottom: 0,
-  width: "100%",
-  background: "#0f172a",
-  padding: 16,
-  borderRadius: "22px 22px 0 0",
-};
-
-const handle = {
-  width: 36,
-  height: 4,
-  background: "#555",
-  borderRadius: 999,
-  margin: "0 auto 12px",
-};
-
-const input = {
-  width: "100%",
-  padding: 12,
-  marginTop: 10,
-  borderRadius: 14,
-  background: "#020617",
-  color: "white",
-  border: "1px solid #333",
-};
-
-const btnPrimary = {
-  marginTop: 14,
-  padding: 14,
-  width: "100%",
-  borderRadius: 16,
-  background: "#3b82f6",
-  color: "white",
-  border: "none",
-};
-
-const btnGhost = {
-  marginTop: 10,
-  padding: 12,
-  width: "100%",
-  borderRadius: 14,
-  background: "transparent",
-  color: "white",
-  border: "1px solid #333",
-};

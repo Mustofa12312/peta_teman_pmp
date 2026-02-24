@@ -38,8 +38,8 @@ function FriendMarker({ friend, onSelect }) {
         },
       }}
     >
-      <Tooltip permanent direction="top" offset={[0, -10]} opacity={1}>
-        <span style={nameLabel}>{friend.nama}</span>
+      <Tooltip permanent direction="top" offset={[0, -10]} opacity={1} className="custom-map-tooltip">
+        <span>{friend.nama}</span>
       </Tooltip>
     </Marker>
   );
@@ -53,11 +53,12 @@ export default function MapView({ friends, onSelect, gpsPin }) {
     <MapContainer
       center={[-2.5, 118]}
       zoom={5}
-      style={{ height: "100vh", width: "100vw" }}
+      style={{ height: "100vh", width: "100vw", zIndex: 0 }}
+      zoomControl={false} /* Better positioning using custom if needed, or disable mobile */
     >
       <TileLayer
         attribution="© OpenStreetMap"
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" /* Use modern map tiles */
       />
 
       {/* MARKER TEMAN */}
@@ -68,31 +69,11 @@ export default function MapView({ friends, onSelect, gpsPin }) {
       {/* MARKER GPS */}
       {gpsPin && (
         <Marker position={[gpsPin.lat, gpsPin.lng]}>
-          <Tooltip permanent direction="top" offset={[0, -10]}>
-            <span style={gpsLabel}>Lokasi Anda</span>
+          <Tooltip permanent direction="top" offset={[0, -10]} className="custom-map-tooltip" style={{border: "1px solid #3b82f6 !important"}}>
+            <span style={{ color: "#60a5fa"}}>📍 Lokasi Anda</span>
           </Tooltip>
         </Marker>
       )}
     </MapContainer>
   );
 }
-
-/* =====================
-   STYLE
-   ===================== */
-const nameLabel = {
-  fontSize: 12,
-  fontWeight: 600,
-  color: "#111",
-  background: "white",
-  padding: "2px 6px",
-  borderRadius: 6,
-  boxShadow: "0 2px 6px rgba(0,0,0,.25)",
-  whiteSpace: "nowrap",
-};
-
-const gpsLabel = {
-  ...nameLabel,
-  background: "#3b82f6",
-  color: "white",
-};

@@ -75,18 +75,8 @@ export default function App() {
      ===================== */
   if (loading) {
     return (
-      <div
-        style={{
-          height: "100vh",
-          background: "#0b0f17",
-          color: "white",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontFamily: "system-ui",
-        }}
-      >
-        <h2>Memuat peta…</h2>
+      <div className="loading-screen">
+        <h2>Memuat peta...</h2>
       </div>
     );
   }
