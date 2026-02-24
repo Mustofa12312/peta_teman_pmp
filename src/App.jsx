@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { fetchFriends } from "./services/friends";
+import { Toaster, toast } from "react-hot-toast";
 
 import MapView from "./components/MapView";
 import PhotoSheet from "./components/PhotoSheet";
@@ -12,6 +13,7 @@ export default function App() {
 
   const [selectedFriend, setSelectedFriend] = useState(null);
   const [openAdd, setOpenAdd] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // 📍 GPS pin untuk map
   const [gpsPin, setGpsPin] = useState(null);
@@ -40,9 +42,11 @@ export default function App() {
      ===================== */
   function handleGPS() {
     if (!navigator.geolocation) {
-      alert("GPS tidak didukung di perangkat ini");
+      toast.error("GPS tidak didukung di perangkat ini");
       return;
     }
+
+    const toastId = toast.loading("Mencari lokasi...", { id: "gps" });
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -54,12 +58,14 @@ export default function App() {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
           });
+          toast.success("Area lokasi Anda ditemukan!", { id: toastId });
         }, 50);
       },
       (err) => {
         console.error(err);
-        alert(
-          err.code === 1 ? "Izin lokasi ditolak" : "Gagal mengambil lokasi GPS"
+        toast.error(
+          err.code === 1 ? "Izin lokasi ditolak" : "Gagal mengambil lokasi GPS", 
+          { id: toastId }
         );
       },
       {
@@ -81,15 +87,47 @@ export default function App() {
     );
   }
 
+  const filteredFriends = friends.filter((f) =>
+    f.nama.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <>
+      {/* 🔔 TOASTER NOTIFICATION */}
+      <Toaster 
+        position="top-center" 
+        toastOptions={{
+          style: {
+            background: '#1e293b',
+            color: '#fff',
+            borderRadius: '16px',
+            border: '1px solid rgba(255,255,255,0.1)'
+          },
+        }} 
+      />
+
+      {/* 🔍 SEARCH BAR FLOATING */}
+      <div className="search-bar-container">
+        <input 
+          type="search" 
+          placeholder="🔍 Tulis nama teman..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="ui-input search-input"
+        />
+      </div>
+
       {/* 🗺️ MAP */}
-      <MapView friends={friends} gpsPin={gpsPin} onSelect={setSelectedFriend} />
+      <MapView friends={filteredFriends} gpsPin={gpsPin} onSelect={setSelectedFriend} />
 
       {/* 🖼️ FOTO BESAR */}
       <PhotoSheet
         friend={selectedFriend}
         onClose={() => setSelectedFriend(null)}
+        onDeleted={() => {
+          setSelectedFriend(null);
+          loadFriends();
+        }}
       />
 
       {/* ➕ ADD FRIEND (INI KUNCI) */}

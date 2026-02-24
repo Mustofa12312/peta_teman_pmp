@@ -1,5 +1,5 @@
 // src/services/friends.js
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 const friendsCol = collection(db, "friends");
@@ -14,4 +14,9 @@ export async function addFriend(data) {
     ...data,
     createdAt: Date.now(),
   });
+}
+
+export async function deleteFriend(id) {
+  const docRef = doc(db, "friends", id);
+  return await deleteDoc(docRef);
 }

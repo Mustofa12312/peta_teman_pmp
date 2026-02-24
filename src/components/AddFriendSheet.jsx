@@ -2,10 +2,12 @@ import { useState } from "react";
 import { addFriend } from "../services/friends";
 import { compressImage } from "../utils/compressImage";
 import { uploadToCloudinary } from "../utils/uploadCloudinary";
+import toast from "react-hot-toast";
 
 export default function AddFriendSheet({ open, onClose, onSaved }) {
   const [nama, setNama] = useState("");
   const [foto, setFoto] = useState(null);
+  const [fotoPreview, setFotoPreview] = useState(null);
   const [pos, setPos] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -14,9 +16,11 @@ export default function AddFriendSheet({ open, onClose, onSaved }) {
      ===================== */
   function ambilGPS() {
     if (!navigator.geolocation) {
-      alert("GPS tidak didukung");
+      toast.error("GPS tidak didukung oleh browser Anda");
       return;
     }
+
+    const toastId = toast.loading("Mencari lokasi...", { id: "gpsAdd" });
 
     navigator.geolocation.getCurrentPosition(
       (p) => {
@@ -24,8 +28,9 @@ export default function AddFriendSheet({ open, onClose, onSaved }) {
           lat: p.coords.latitude,
           lng: p.coords.longitude,
         });
+        toast.success("Lokasi terdeteksi", { id: toastId });
       },
-      () => alert("Gagal ambil lokasi, aktifkan GPS"),
+      () => toast.error("Gagal ambil lokasi, aktifkan GPS", { id: toastId }),
       { enableHighAccuracy: true, timeout: 15000 }
     );
   }
@@ -37,7 +42,7 @@ export default function AddFriendSheet({ open, onClose, onSaved }) {
     e.preventDefault();
 
     if (!nama || !foto || !pos) {
-      alert("Nama, foto, dan lokasi wajib!");
+      toast.error("Nama, foto, dan lokasi wajib diisi!", { duration: 3000 });
       return;
     }
 
@@ -63,15 +68,17 @@ export default function AddFriendSheet({ open, onClose, onSaved }) {
 
       // 🔥 INI KUNCI UTAMA
       onSaved?.();
+      toast.success("Berhasil menambahkan data teman!");
 
       // RESET FORM
       setNama("");
       setFoto(null);
+      setFotoPreview(null);
       setPos(null);
       onClose();
     } catch (err) {
       console.error(err);
-      alert("Upload gagal");
+      toast.error("Gagal mengunggah wajah, file mungkin terlalu besar.");
     } finally {
       setLoading(false);
     }
@@ -96,9 +103,26 @@ export default function AddFriendSheet({ open, onClose, onSaved }) {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => setFoto(e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                setFoto(file);
+                setFotoPreview(URL.createObjectURL(file));
+              }
+            }}
             className="ui-input"
           />
+
+          {/* FOTO PREVIEW */}
+          {fotoPreview && (
+            <div style={{ marginBottom: 12, display: "flex", justifyContent: "center" }}>
+              <img 
+                src={fotoPreview} 
+                alt="Preview" 
+                style={{ height: 120, width: "auto", borderRadius: 14, border: "2px solid rgba(255,255,255,0.1)", objectFit: "contain" }} 
+              />
+            </div>
+          )}
 
           <button type="button" onClick={ambilGPS} className="ui-button ui-button-ghost">
             <svg className="icon" fill="currentColor" viewBox="0 0 24 24">
