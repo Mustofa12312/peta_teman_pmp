@@ -5,6 +5,7 @@ import {
   Tooltip,
   useMap,
 } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -46,6 +47,21 @@ function FriendMarker({ friend, onSelect }) {
 }
 
 /* =====================
+   KOMPONEN UNTUK AUTOPAN MAP KE GPS
+   ===================== */
+function GPSMarkerUpdater({ gpsPin }) {
+  const map = useMap();
+  
+  if (gpsPin) {
+    map.flyTo([gpsPin.lat, gpsPin.lng], 15, {
+      animate: true,
+      duration: 1.2
+    });
+  }
+  return null;
+}
+
+/* =====================
    MAP UTAMA
    ===================== */
 export default function MapView({ friends, onSelect, gpsPin }) {
@@ -61,18 +77,32 @@ export default function MapView({ friends, onSelect, gpsPin }) {
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" /* Use modern map tiles */
       />
 
-      {/* MARKER TEMAN */}
-      {friends.map((f) => (
-        <FriendMarker key={f.id} friend={f} onSelect={onSelect} />
-      ))}
+      {/* MARKER TEMAN DENGAN CLUSTER */}
+      <MarkerClusterGroup
+        chunkedLoading
+        iconCreateFunction={(cluster) => {
+          return L.divIcon({
+            html: `<div><span>${cluster.getChildCount()}</span></div>`,
+            className: "custom-cluster-icon",
+            iconSize: L.point(40, 40, true),
+          });
+        }}
+      >
+        {friends.map((f) => (
+          <FriendMarker key={f.id} friend={f} onSelect={onSelect} />
+        ))}
+      </MarkerClusterGroup>
 
       {/* MARKER GPS */}
       {gpsPin && (
-        <Marker position={[gpsPin.lat, gpsPin.lng]}>
-          <Tooltip permanent direction="top" offset={[0, -10]} className="custom-map-tooltip" style={{border: "1px solid #3b82f6 !important"}}>
-            <span style={{ color: "#60a5fa"}}>📍 Lokasi Anda</span>
-          </Tooltip>
-        </Marker>
+        <>
+          <GPSMarkerUpdater gpsPin={gpsPin} />
+          <Marker position={[gpsPin.lat, gpsPin.lng]}>
+            <Tooltip permanent direction="top" offset={[0, -10]} className="custom-map-tooltip" style={{border: "1px solid #3b82f6 !important"}}>
+              <span style={{ color: "#60a5fa"}}>📍 Lokasi Anda</span>
+            </Tooltip>
+          </Marker>
+        </>
       )}
     </MapContainer>
   );

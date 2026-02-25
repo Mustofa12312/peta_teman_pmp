@@ -51,18 +51,6 @@ export default function PhotoSheet({ friend, onClose, onDeleted }) {
         {/* TOMBOL */}
         <div style={{ display: "flex", gap: "12px", marginTop: "16px" }}>
           
-          {/* Hapus Button */}
-          <button 
-            className="ui-button ui-button-ghost" 
-            style={{ flex: 0.3, color: "#f87171", borderColor: "rgba(248, 113, 113, 0.3)" }}
-            onClick={handleDelete}
-            disabled={deleting}
-          >
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"/>
-            </svg>
-          </button>
-          
           <button className="ui-button ui-button-ghost" onClick={onClose} style={{ flex: 1 }}>
             Tutup
           </button>
